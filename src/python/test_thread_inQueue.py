@@ -19,12 +19,12 @@ class mythread(Thread):
 
 q = Queue.Queue(1000)
 
-for i in range(100):
+for i in range(110):
     q.put("cmd_"+str(i))
 
-t1 = mythread("t1",2,q)
-t2 = mythread("t2",10,q)
-t3 = mythread("t3",10,q)
+t1 = mythread("t1",1,q)
+t2 = mythread("t2",5,q)
+t3 = mythread("t3",5,q)
 t1.start()
 t2.start()
 t3.start()
