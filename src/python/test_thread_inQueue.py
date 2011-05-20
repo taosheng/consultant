@@ -15,7 +15,9 @@ class mythread(Thread):
             	    print self.mid+ " nothing to run :"+" ("+str(time.ctime())+")"
 		time.sleep(self.sleep)
 
-
+##
+## send a job to a given queue
+##
 class sendJobToQueue(Thread):
 	def __init__(self,sleep,q):
 	    Thread.__init__(self)
