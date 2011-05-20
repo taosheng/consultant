@@ -16,15 +16,31 @@ class mythread(Thread):
 		time.sleep(self.sleep)
 
 
+class sendJobToQueue(Thread):
+	def __init__(self,sleep,q):
+	    Thread.__init__(self)
+	    self.sleep = sleep
+	    self.queue =  q
 
-q = Queue.Queue(1000)
+
+        def run(self):
+            for i in range(30):
+                time.sleep(self.sleep)
+                q.put("additional cmd!")
+   
+
+q = Queue.Queue(110)
 
 for i in range(110):
     q.put("cmd_"+str(i))
 
 t1 = mythread("t1",1,q)
-t2 = mythread("t2",5,q)
-t3 = mythread("t3",5,q)
+t2 = mythread("t2",1,q)
+t3 = mythread("t3",2,q)
+
 t1.start()
 t2.start()
 t3.start()
+
+job = sendJobToQueue(20,q)
+job.start()
