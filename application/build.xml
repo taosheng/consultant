@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="bd" default="dist" basedir=".">
+    <description>bdexample</description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+  <property name="thirdParty"  location="thirdParty"/>
+  <property name="hadoop_lib"  location="/home/doug/hadoop-1.0.3/"/>
+
+  <path id="compile.classpath">
+    <pathelement location="${build}"/>
+    <fileset dir="${thirdParty}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${hadoop_lib}">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+  <path id="run.classpath">
+    <fileset dir="${dist}/">
+      <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${thirdParty}">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${build}"/>
+    <mkdir dir="${dist}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <javac srcdir="${src}" destdir="${build}">
+        <classpath refid="compile.classpath" />
+    </javac>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <mkdir dir="${dist}/lib"/>
+    <jar jarfile="${dist}/lib/xxx-${DSTAMP}.jar" basedir="${build}"/>
+  </target>
+  <target name="run" depends="dist"
+        description="defaul running program " >
+     <java classname="example.fromnet.WordCount" >
+         <classpath refid="run.classpath"> </classpath>
+       </java>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
+

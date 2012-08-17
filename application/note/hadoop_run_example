@@ -1,0 +1,2 @@
+
+./bin/hadoop jar /home/doug/github/consultant/dist/lib/xxx-20120817.jar  example.fromnet.WordCount /user/doug/inputSource /user/doug/output
