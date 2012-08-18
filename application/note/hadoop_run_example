@@ -1,2 +1,6 @@
 
 ./bin/hadoop jar /home/doug/github/consultant/dist/lib/xxx-20120817.jar  example.fromnet.WordCount /user/doug/inputSource /user/doug/output
+
+
+./bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar -file /home/doug/github/consultant/application/python/wordCountMapper.py -mapper /home/doug/github/consultant/application/python/wordCountMapper.py  -file /home/doug/github/consultant/application/python/wordCountReducer.py -reducer /home/doug/github/consultant/application/python/wordCountReducer.py  -input /user/doug/inputSource/* -output /user/doug/output
+
