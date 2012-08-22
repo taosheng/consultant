@@ -6,6 +6,6 @@
 
 ./bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=1 -D mapred.map.tasks=3  -file /home/doug/github/consultant/application/python/wordCountMapper.py -mapper /home/doug/github/consultant/application/python/wordCountMapper.py  -file /home/doug/github/consultant/application/python/wordCountReducer.py -reducer /home/doug/github/consultant/application/python/wordCountReducer.py  -input /user/doug/sourceDir/* -output /user/doug/output_n6
 
-./bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=3  -file /home/doug/github/consultant/application/python/wordCountMapper.py -mapper /home/doug/github/consultant/application/python/linkAnalysis.py  -input /user/doug/urlSource/* -output /user/doug/output_n12
+./bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/doug/github/consultant/application/python/linkAnalysis.py -mapper /home/doug/github/consultant/application/python/linkAnalysis.py  -input /user/doug/urlSource/* -output /user/doug/output_n14
 
 (*) what are in the /user/doug/urlSource/* ==> each line of the files is an URL!
