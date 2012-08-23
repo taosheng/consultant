@@ -8,4 +8,9 @@
 
 ./bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/doug/github/consultant/application/python/linkAnalysis.py -mapper /home/doug/github/consultant/application/python/linkAnalysis.py  -input /user/doug/urlSource/* -output /user/doug/output_n14
 
+./bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/doug/github/consultant/application/python/linkAnalysis.py -mapper /home/doug/github/consultant/application/python/linkAnalysis.py  -input /user/doug/urlSource/* -output /user/doug/output_n14
+
+./bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=5  -file /home/doug/github/consultant/application/python/P4ParserMap.py  -mapper /home/doug/github/consultant/application/python/P4ParserMap.py  -input /user/doug/p4source/* -output /user/doug/output_p4_n5
+
+
 (*) what are in the /user/doug/urlSource/* ==> each line of the files is an URL!
