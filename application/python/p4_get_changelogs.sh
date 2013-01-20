@@ -11,4 +11,4 @@ p4flag="-c $p4client -p $p4port -u $p4user"
 #p4 sync
 
 #~/bin/p4 $p4flag changes "@2013/01/15,@now" "//Ent/SSFB/Dev/SSFB_Server-2.1/..."
-~/bin/p4 $p4flag -L changes   "//Ent/SSFB/Dev/SSFB_Server-2.1/..."@2013/01/15,@now
+~/bin/p4 $p4flag  changes -L  "//Ent/SSFB/Dev/SSFB_Server-2.1/..."@2013/01/15,@now
