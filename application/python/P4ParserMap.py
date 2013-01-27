@@ -4,6 +4,13 @@ import sys
 import re
 
 
+def pathToDecimalString(path):
+    tmp="0."
+    for c in path:
+        tmp = tmp + str( ord(c))
+    return tmp
+
+
 def resetDict(oneChange):
     oneChange['time'] =''
     oneChange['id'] =''
@@ -30,9 +37,7 @@ def main(separator='\t'):
         lineCnt +=1
         line = line.strip()
         if re.match('Change .*', line) is not None:
-            if oneChange['reviewer'] == '':
-                print str(oneChange)
-         
+            print "%s <= %s"%(oneChange['submitter'], oneChange['reviewer'])
             resetDict(oneChange)
             parts = line.split(" ")
             oneChange['id'] = parts[3]
