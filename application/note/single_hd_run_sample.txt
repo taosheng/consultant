@@ -1,0 +1,35 @@
+(1) install single node hadoop
+(2) prepare environment
+
+hadoop@hd1:~$ hadoop dfs -mkdir input
+Warning: $HADOOP_HOME is deprecated.
+
+hadoop@hd1:~$ hadoop dfs -mkdir output
+Warning: $HADOOP_HOME is deprecated.
+
+hadoop@hd1:~$ hadoop dfs -ls
+Warning: $HADOOP_HOME is deprecated.
+
+Found 2 items
+drwxr-xr-x   - hadoop supergroup          0 2013-01-27 12:50 /user/hadoop/input
+drwxr-xr-x   - hadoop supergroup          0 2013-01-27 12:50 /user/hadoop/output
+
+(3) copy or git clone the 3rd party application to there...
+hadoop@hd1:~/application$ ls
+build  build.xml  dist  note  python  README  src  testurl.txt
+hadoop@hd1:~/application$ pwd
+/home/hadoop/application
+
+(4) copy file to input /user/hadoop/input
+
+hadoop@hd1:~/application$ hadoop dfs -copyFromLocal testurl.txt /user/hadoop/input/
+hadoop@hd1:~/application$ hadoop dfs -ls /user/hadoop/input
+
+Found 1 items
+-rw-r--r--   1 hadoop supergroup        169 2013-01-27 12:58 /user/hadoop/input/testurl.txt
+
+
+(5) execute program
+
+adoop@hd1:/usr/local/hadoop$ pwd/usr/local/hadoophadoop@hd1:/usr/local/hadoop$ hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/hadoop/application/python/linkAnalysis.py -mapper /home/hadoop/application/python/linkAnalysis.py  -input /user/hadoop/input/* -output /user/hadoop/output_new1/
+
