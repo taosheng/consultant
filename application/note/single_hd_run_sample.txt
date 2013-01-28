@@ -29,7 +29,12 @@ Found 1 items
 -rw-r--r--   1 hadoop supergroup        169 2013-01-27 12:58 /user/hadoop/input/testurl.txt
 
 
-(5) execute program
+(5) create tmp folder :/tmp/show
+hadoop@hd1:~/application$ mkdir /tmp/show
 
-adoop@hd1:/usr/local/hadoop$ pwd/usr/local/hadoophadoop@hd1:/usr/local/hadoop$ hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/hadoop/application/python/linkAnalysis.py -mapper /home/hadoop/application/python/linkAnalysis.py  -input /user/hadoop/input/* -output /user/hadoop/output_new1/
+(6) execute program
+
+* cd to hadoop home $ cd $HADOOP_HOME
+* execute...(remember to change output folder name)
+hadoop@hd1:/usr/local/hadoop$ hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/hadoop/application/python/linkAnalysis.py -mapper /home/hadoop/application/python/linkAnalysis.py  -input /user/hadoop/input/* -output /user/hadoop/output_newXX
 
