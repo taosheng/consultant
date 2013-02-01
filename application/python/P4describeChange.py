@@ -2,6 +2,7 @@
 
 import sys
 import re
+import commands
 
 
 def pathToDecimalString(path):
@@ -37,13 +38,15 @@ def main(separator='\t'):
         lineCnt +=1
         line = line.strip()
         if re.match('Change .*', line) is not None:
-            print "%s <= %s"%(oneChange['submitter'], oneChange['reviewer'])
+            #print "%s <= %s"%(oneChange['submitter'], oneChange['reviewer'])
             resetDict(oneChange)
             parts = line.split(" ")
-            oneChange['id'] = parts[3]
+            oneChange['id'] = parts[1]
             oneChange['action'] = parts[4]
             oneChange['time'] = parts[3]
             oneChange['submitter'] = parts[5].split("@")[0]
+            cmd = "~/bin/p4 -c tsu -p 10.201.16.19:1667 -u Tao-Sheng_Chen describe -S " + oneChange['id']
+            print commands.getoutput(cmd)
         elif re.match('.*Reviewed by.*',line) is not None:
             reviewerLineParts = line.split("Reviewed by: ")
             if len(reviewerLineParts) > 1:

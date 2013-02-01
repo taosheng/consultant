@@ -1,6 +1,6 @@
 p4user="Tao-Sheng_Chen"
 P4PASSWD=$1
-p4port="10.201.16.19:1667"
+export P4PORT="10.201.16.19:1667"
 p4client="`hostname`"
 p4flag="-c $p4client -p $p4port -u $p4user"
 
