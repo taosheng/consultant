@@ -18,12 +18,14 @@
  export HADOOP_YARN_HOME=/home/doug/hadoop
  export HADOOP_CONF_DIR=/home/doug/hadoop/etc/hadoop
  export YARN_CONF_DIR=$HADOOP_CONF_DIR
+ export PATH=$PATH:/home/doug/hadoop/bin
 
  * run the example ./hadoop/bin/hadoop jar hadoop-examples.jar randomwriter out
   the hadoop-examples.jar download from ->wget http://www.java2s.com/Code/JarDownload/hadoop-examples/hadoop-examples.jar.zip
 
 (2) prepare environment
 
+ * in 2.2.0 the "hadoop dfs..." commend should be replaced by "hdfs dfs..."
 hadoop@hd1:~$ hadoop dfs -mkdir input
 Warning: $HADOOP_HOME is deprecated.
 
@@ -60,4 +62,9 @@ hadoop@hd1:~/application$ mkdir /tmp/show
 * cd to hadoop home $ cd $HADOOP_HOME
 * execute...(remember to change output folder name)
 hadoop@hd1:/usr/local/hadoop$ hadoop jar contrib/streaming/hadoop-*streaming*.jar  -D mapred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/hadoop/application/python/linkAnalysis.py -mapper /home/hadoop/application/python/linkAnalysis.py  -input /user/hadoop/input/* -output /user/hadoop/output_newXX
+
+* the new environment (in shared hosted server)
+./bin/hadoop jar /home/doug/hadoop_source/hadoop-2.2.0/share/hadoop/tools/lib/hadoop-streaming-2.2.0.jar -D apred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/doug/github/consultant/application/python/linkAnalysis.py  -mapper /home/doug/github/consultant/application/python/linkAnalysis.py  -input /home/doug/input/* -output /home/doug/output_new01
+
+
 
