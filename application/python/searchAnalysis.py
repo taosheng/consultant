@@ -16,9 +16,8 @@ URL = 'http://ajax.googleapis.com/ajax/services/search/web?rsz=8&v=1.0&'
 PAGE_SIZE = 8
 RUN_PAGES = 2
 
-QUERY_STRING = '陳道陞'
 def doQuery(queryString,start=0):
-    query = urllib.urlencode ( { 'q' : QUERY_STRING } )
+    query = urllib.urlencode ( { 'q' : queryString } )
     response = urllib.urlopen ( URL + query ).read()
     json = m_json.loads ( response )
     res = json['responseData']
@@ -38,7 +37,7 @@ def main(separator='\t'):
             for result in resultDict:
                 title = result['title']
                 url = result['url'] 
-                print ( url+","+QUERY_STRING+","+title )
+                print ( url+","+queryString+","+title )
 
 #        for word in words:
 #            print '%s%s%d' % (word, separator, 1)
