@@ -17,7 +17,7 @@
  export HADOO_MAPRED_HOME=/home/doug/hadoop
  export HADOOP_YARN_HOME=/home/doug/hadoop
  export HADOOP_CONF_DIR=/home/doug/hadoop/etc/hadoop
- export YARN_CONF_DIR=$HADOOP_CONF_DIR
+ expor tYARN_CONF_DIR=$HADOOP_CONF_DIR
  export PATH=$PATH:/home/doug/hadoop/bin
 
  * run the example ./hadoop/bin/hadoop jar hadoop-examples.jar randomwriter out
@@ -65,6 +65,13 @@ hadoop@hd1:/usr/local/hadoop$ hadoop jar contrib/streaming/hadoop-*streaming*.ja
 
 * the new environment (in shared hosted server)
 ./bin/hadoop jar /home/doug/hadoop_source/hadoop-2.2.0/share/hadoop/tools/lib/hadoop-streaming-2.2.0.jar -D apred.reduce.tasks=0 -D mapred.map.tasks=2  -file /home/doug/github/consultant/application/python/linkAnalysis.py  -mapper /home/doug/github/consultant/application/python/linkAnalysis.py  -input /home/doug/input/* -output /home/doug/output_new01
+
+
+
+hadoop jar /home/doug/hadoop_source/hadoop-2.2.0/share/hadoop/tools/lib/*streaming*.jar \
+-file searchAnalysisMap.py  -mapper searchAnalysisMap.py \
+-file searchAnalysisReducer.py -reducer searchAnalysisReducer.py \
+-input test/* -output /home/doug/output_new01
 
 
 
