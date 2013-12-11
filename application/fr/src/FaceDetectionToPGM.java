@@ -77,8 +77,10 @@ public class FaceDetectionToPGM
      //                   CvScalar.YELLOW, 6, CV_AA, 0);
      println("width->"+r.width());
      println("height->"+r.height());
-      cvSetImageROI(origImg, r );
-      IplImage smallface=cvCreateImage( cvSize(r.width(),r.height()), 8, 3 );
+     println("x->"+r.x());
+     println("y->"+r.y());
+      cvSetImageROI(origImg, cvRect(r.x()*SCALE,r.y()*SCALE,r.width()*SCALE,r.height()*SCALE) );
+      IplImage smallface=cvCreateImage( cvSize(r.width()*SCALE,r.height()*SCALE), 8, 3 );
 
       cvCopy(origImg,smallface);
       cvSaveImage(OUT_FILE+"_"+i+".pgm", smallface);
