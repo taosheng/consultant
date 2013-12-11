@@ -1,5 +1,4 @@
-// FaceDetection.java
-// Andrew Davison, March 2011, ad@fivedots.psu.ac.th
+import java.io.*;
 
 import com.googlecode.javacv.*;
 import com.googlecode.javacv.cpp.*;
@@ -14,7 +13,7 @@ import static com.googlecode.javacv.cpp.opencv_objdetect.*;
 public class FaceDetectionToPGM
 {
   private static final int SCALE = 2;     
-     // scaling factor to reduce size of input image
+  // scaling factor to reduce size of input image
 
   // cascade definition for face detection
   private static final String CASCADE_FILE = "haarcascade_frontalface_alt.xml";
@@ -25,21 +24,12 @@ public class FaceDetectionToPGM
   private static void println(Object msg)throws Exception{
       System.out.println(msg);
   }
-  public static void main(String[] args)throws Exception
-  {
-    if (args.length != 1) {
-      System.out.println("Usage: run FaceDetection <input-file>");
-      return;
-    }
 
-    System.out.println("Starting OpenCV...");
 
-    // preload the opencv_objdetect module to work around a known bug
-    Loader.load(opencv_objdetect.class); 
-
+  public static void generatePGMFromPic(String file)throws Exception{
     // load an image
-    System.out.println("Loading image from " + args[0]);
-    IplImage origImg = cvLoadImage(args[0]);
+    System.out.println("Loading image from " + file);
+    IplImage origImg = cvLoadImage(file);
 
     // convert to grayscale
     IplImage grayImg = IplImage.create(origImg.width(),
@@ -83,17 +73,38 @@ public class FaceDetectionToPGM
       IplImage smallface=cvCreateImage( cvSize(r.width()*SCALE,r.height()*SCALE), 8, 3 );
 
       cvCopy(origImg,smallface);
-      cvSaveImage(OUT_FILE+"_"+i+".pgm", smallface);
-
+      cvSaveImage(file+"_"+i+".pgm", smallface);
       cvResetImageROI(origImg);
 
-
     }
 
-    if (total > 0) {
-//      System.out.println("Saving marked-faces version of " + args[0] + " in " + OUT_FILE);
-   //   cvSaveImage(OUT_FILE, origImg);
+  }
+  public static void main(String[] args)throws Exception
+  {
+    if (args.length != 1) {
+      println("generate face pgm files from pictures");
+      println("Usage: run FaceDetection <inputfolder>");
+      return;
     }
+
+    System.out.println("Starting OpenCV...");
+
+    // preload the opencv_objdetect module to work around a known bug
+    Loader.load(opencv_objdetect.class); 
+    String path = args[0];
+
+    File folder = new File(path);
+    File[] listOfFiles = folder.listFiles(); 
+ 
+    for (int i = 0; i < listOfFiles.length; i++) {
+       if (listOfFiles[i].isFile()) {
+           String files = listOfFiles[i].getName();
+           println(path+"/"+files);
+           generatePGMFromPic(path+"/"+files);
+       }
+    }
+
+    return ;
   }  // end of main()
 
 }  // end of FaceDetection class
