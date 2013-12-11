@@ -19,10 +19,13 @@ public class FaceDetectionToPGM
   // cascade definition for face detection
   private static final String CASCADE_FILE = "haarcascade_frontalface_alt.xml";
 
-  private static final String OUT_FILE = "markedFaces";
+  private static final String OUT_FILE = "mf";
 
 
-  public static void main(String[] args)
+  private static void println(Object msg)throws Exception{
+      System.out.println(msg);
+  }
+  public static void main(String[] args)throws Exception
   {
     if (args.length != 1) {
       System.out.println("Usage: run FaceDetection <input-file>");
@@ -70,16 +73,23 @@ public class FaceDetectionToPGM
     for (int i = 0; i < total; i++) {
       CvRect r = new CvRect(cvGetSeqElem(faces, i));
      // cvRectangle(origImg, cvPoint( r.x()*SCALE, r.y()*SCALE ),    // undo the scaling
-     //               cvPoint( (r.x() + r.width())*SCALE, (r.y() + r.height())*SCALE ), 
+     // cvPoint( (r.x() + r.width())*SCALE, (r.y() + r.height())*SCALE ), 
      //                   CvScalar.YELLOW, 6, CV_AA, 0);
+     println("width->"+r.width());
+     println("height->"+r.height());
       cvSetImageROI(origImg, r );
       IplImage smallface=cvCreateImage( cvSize(r.width(),r.height()), 8, 3 );
 
+      cvCopy(origImg,smallface);
       cvSaveImage(OUT_FILE+"_"+i+".pgm", smallface);
+
+      cvResetImageROI(origImg);
+
+
     }
 
     if (total > 0) {
-      System.out.println("Saving marked-faces version of " + args[0] + " in " + OUT_FILE);
+//      System.out.println("Saving marked-faces version of " + args[0] + " in " + OUT_FILE);
    //   cvSaveImage(OUT_FILE, origImg);
     }
   }  // end of main()
