@@ -26,10 +26,11 @@ public class FaceDetectionToPGM
   }
 
 
-  public static void generatePGMFromPic(String file)throws Exception{
+  public static void generatePGMFromPic(String srcPath, String file, String destPath)throws Exception{
     // load an image
-    System.out.println("Loading image from " + file);
-    IplImage origImg = cvLoadImage(file);
+    String srcFilePath = srcPath+"/"+file; 
+    System.out.println("Loading image from " + srcFilePath);
+    IplImage origImg = cvLoadImage(srcFilePath);
 
     // convert to grayscale
     IplImage grayImg = IplImage.create(origImg.width(),
@@ -70,10 +71,12 @@ public class FaceDetectionToPGM
      println("x->"+r.x());
      println("y->"+r.y());
       cvSetImageROI(origImg, cvRect(r.x()*SCALE,r.y()*SCALE,r.width()*SCALE,r.height()*SCALE) );
-      IplImage smallface=cvCreateImage( cvSize(r.width()*SCALE,r.height()*SCALE), 8, 3 );
+      IplImage origface=cvCreateImage( cvSize(r.width()*SCALE,r.height()*SCALE), 8, 3 );
 
-      cvCopy(origImg,smallface);
-      cvSaveImage(file+"_"+i+".pgm", smallface);
+      IplImage smallface=cvCreateImage( cvSize(120,120), 8, 3 );
+      cvCopy(origImg,origface);
+      cvResize(origface, smallface, CV_INTER_LINEAR);
+      cvSaveImage(destPath+"/"+file+i+".pgm", smallface);
       cvResetImageROI(origImg);
 
     }
@@ -81,9 +84,9 @@ public class FaceDetectionToPGM
   }
   public static void main(String[] args)throws Exception
   {
-    if (args.length != 1) {
+    if (args.length < 2) {
       println("generate face pgm files from pictures");
-      println("Usage: run FaceDetection <inputfolder>");
+      println("Usage: run FaceDetection <inputfolder> <outputfolder>");
       return;
     }
 
@@ -91,16 +94,17 @@ public class FaceDetectionToPGM
 
     // preload the opencv_objdetect module to work around a known bug
     Loader.load(opencv_objdetect.class); 
-    String path = args[0];
+    String srcPath = args[0];
+    String destPath = args[1];
 
-    File folder = new File(path);
+    File folder = new File(srcPath);
     File[] listOfFiles = folder.listFiles(); 
  
     for (int i = 0; i < listOfFiles.length; i++) {
        if (listOfFiles[i].isFile()) {
            String files = listOfFiles[i].getName();
-           println(path+"/"+files);
-           generatePGMFromPic(path+"/"+files);
+           println(srcPath+"/"+files);
+           generatePGMFromPic(srcPath, files,destPath);
        }
     }
 

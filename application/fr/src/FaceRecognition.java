@@ -780,9 +780,9 @@ public class FaceRecognition {
 
     final FaceRecognition faceRecognition = new FaceRecognition();
     //faceRecognition.learn("data/some-training-faces.txt");
-    faceRecognition.learn("/home/doug/mypic_list");
+    faceRecognition.learn(args[0]);
     //faceRecognition.recognizeFileList("data/some-test-faces.txt");
-    faceRecognition.recognizeFileList("/home/doug/toshow_list");
+    faceRecognition.recognizeFileList(args[1]);
   }
 }
 

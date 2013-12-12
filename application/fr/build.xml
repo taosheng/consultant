@@ -43,7 +43,17 @@
   <target name="run" depends="dist"
         description="defaul running program " >
      <java classname="FaceDetectionToPGM" >
-         <arg value="p6.jpg"/>
+         <arg value="face_jpg_source"/>
+         <arg value="face_source"/>
+         <classpath refid="run.classpath"> </classpath>
+       </java>
+  </target>
+
+  <target name="runRecognition" depends="dist"
+        description="defaul running program " >
+     <java classname="FaceRecognition" >
+         <arg value="/home/doug/mypic_list" />
+         <arg value="/home/doug/toshow_list" />
          <classpath refid="run.classpath"> </classpath>
        </java>
   </target>
