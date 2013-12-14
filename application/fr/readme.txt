@@ -10,3 +10,6 @@ Top 10 Wanted Face Recognition
 (2) Client side
    (2.1) Raspberry PI
    (2.2) iOS client
+
+Note: 
+  still need to have opencv installed!!!
