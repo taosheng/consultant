@@ -1,35 +1,6 @@
 /*
  * FaceRecognition.java
  *
- * Created on Dec 7, 2011, 1:27:25 PM
- *
- * Description: Recognizes faces.
- *
- * Copyright (C) Dec 7, 2011, Stephen L. Reed, Texai.org. (Fixed April 22, 2012, Samuel Audet)
- *
- * This file is a translation from the OpenCV example http://www.shervinemami.info/faceRecognition.html, ported
- * to Java using the JavaCV library.  Notable changes are the addition of the Java Logging framework and the
- * installation of image files in a data directory child of the working directory. Some of the code has
- * been expanded to make debugging easier.  Expected results are 100% recognition of the lower3.txt test
- * image index set against the all10.txt training image index set.  See http://en.wikipedia.org/wiki/Eigenface
- * for a technical explanation of the algorithm.
- *
- * stephenreed@yahoo.com
- *
- * FaceRecognition is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version (subject to the "Classpath" exception
- * as provided in the LICENSE.txt file that accompanied this code).
- *
- * FaceRecognition is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with JavaCV.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 import com.googlecode.javacpp.FloatPointer;
 import com.googlecode.javacpp.Pointer;

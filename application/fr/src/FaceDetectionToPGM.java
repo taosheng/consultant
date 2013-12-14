@@ -27,7 +27,6 @@ public class FaceDetectionToPGM
 
 
   public static void generatePGMFromPic(String srcPath, String file, String destPath)throws Exception{
-    // load an image
     String srcFilePath = srcPath+"/"+file; 
     System.out.println("Loading image from " + srcFilePath);
     IplImage origImg = cvLoadImage(srcFilePath);
@@ -47,10 +46,8 @@ public class FaceDetectionToPGM
                                       smallImg.height(), IPL_DEPTH_8U, 1);
           cvEqualizeHist(smallImg, equImg);
 
-    // create temp storage, used during object detection
     CvMemStorage storage = CvMemStorage.create();
 
-    // instantiate a classifier cascade for face detection
     CvHaarClassifierCascade cascade = new CvHaarClassifierCascade(
                                                      cvLoad(CASCADE_FILE));
     System.out.println("Detecting faces...");
@@ -58,14 +55,10 @@ public class FaceDetectionToPGM
                                         CV_HAAR_DO_CANNY_PRUNING);
     cvClearMemStorage(storage);
 
-    // iterate over the faces and draw yellow rectangles around them
     int total = faces.total();
     System.out.println("Found " + total + " face(s)");
     for (int i = 0; i < total; i++) {
       CvRect r = new CvRect(cvGetSeqElem(faces, i));
-     // cvRectangle(origImg, cvPoint( r.x()*SCALE, r.y()*SCALE ),    // undo the scaling
-     // cvPoint( (r.x() + r.width())*SCALE, (r.y() + r.height())*SCALE ), 
-     //                   CvScalar.YELLOW, 6, CV_AA, 0);
      println("width->"+r.width());
      println("height->"+r.height());
      println("x->"+r.x());
