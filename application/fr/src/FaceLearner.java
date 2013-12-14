@@ -1,11 +1,12 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.* ;
 import java.util.logging.Logger;
 
 import com.googlecode.javacv.*;
 import com.googlecode.javacv.cpp.*;
 import com.googlecode.javacpp.Loader;
+import com.googlecode.javacpp.FloatPointer;
+import com.googlecode.javacpp.Pointer;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
@@ -118,16 +119,19 @@ public class FaceLearner {
 
      LOGGER.info("computing average image, eigenvalues and eigenvectors");
     // compute average image, eigenvalues, and eigenvectors
+    eigenVectArr = eigens.toArray(new IplImage[eigens.size()]);
     cvCalcEigenObjects(
             nTrainFaces, // nObjects
             trainingFaces.toArray(new IplImage[trainingFaces.size()]), // input
-            eigens.toArray(new IplImage[eigens.size()]), // output
+            eigenVectArr, // the output is array... need to transfer to arrayList latter
             CV_EIGOBJ_NO_CALLBACK, // ioFlags
             0, // ioBufSize
             null, // userData
             calcLimit,
             pAvgTrainImg, // avg
             eigenValMat.data_fl()); // eigVals
+    
+    // eigens = (ArrayList) Arrays.asList(eigenVectArr)  ;
 
     LOGGER.info("normalizing the eigenvectors");
     cvNormalize(
@@ -137,6 +141,60 @@ public class FaceLearner {
             0, // b
             CV_L1, // norm_type
             null); // mask
+
+
+
+    LOGGER.info("projecting the training images onto the PCA subspace");
+    // project the training images onto the PCA subspace
+    projectedTrainFaceMat = cvCreateMat(
+            nTrainFaces, // rows
+            nEigens, // cols
+            CV_32FC1); // type, 32-bit float, 1 channel
+
+    // initialize the training face matrix - for ease of debugging
+    for (int i1 = 0; i1 < nTrainFaces; i1++) {
+      for (int j1 = 0; j1 < nEigens; j1++) {
+        projectedTrainFaceMat.put(i1, j1, 0.0);
+      }
+    }
+
+
+    LOGGER.info("created projectedTrainFaceMat with " + nTrainFaces + " (nTrainFaces) rows and " + nEigens + " (nEigens) columns");
+/** nTrainFace should always > 5 !!!!!!!!!!!!!!!!
+    if (nTrainFaces < 5) {
+      LOGGER.info("projectedTrainFaceMat contents:\n" + oneChannelCvMatToString(projectedTrainFaceMat));
+    }
+*/
+   final FloatPointer floatPointer = new FloatPointer(nEigens);
+    for (int i = 0; i < nTrainFaces; i++) {
+      cvEigenDecomposite(
+              trainingFaces.get(i), // obj
+              nEigens, // nEigObjs
+              eigenVectArr, // eigInput (Pointer)
+              0, // ioFlags
+              null, // userData (Pointer)
+              pAvgTrainImg, // avg
+              floatPointer); // coeffs (FloatPointer)
+
+/*nTrainFace should always > 5 !!!!!!!!!!!!!!!!
+      if (nTrainFaces < 5) {
+        LOGGER.info("floatPointer: " + floatPointerToString(floatPointer));
+      }*/
+      for (int j1 = 0; j1 < nEigens; j1++) {
+        projectedTrainFaceMat.put(i, j1, floatPointer.get(j1));
+      }
+    }
+/*nTrainFace should always > 5 !!!!!!!!!!!!!!!!
+    if (nTrainFaces < 5) {
+      LOGGER.info("projectedTrainFaceMat after cvEigenDecomposite:\n" + projectedTrainFaceMat);
+    }
+*/
+    // store the recognition data as an xml file
+//    storeTrainingData();
+
+    // Save all the eigenvectors as images, so that they can be checked.
+  //  storeEigenfaceImages();
+
 
 
   }
