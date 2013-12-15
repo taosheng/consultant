@@ -33,6 +33,7 @@ public class FaceLearner {
   ArrayList<IplImage> trainingFaces = new ArrayList<IplImage>();
   /** the test face image array */
   IplImage[] testFaceImgArr;
+  ArrayList<IplImage> testFaces = new ArrayList<IplImage>();
   /** the person number array */
   CvMat personNumTruthMat;
   /** the number of persons */
@@ -55,18 +56,137 @@ public class FaceLearner {
 
     String personName = args[0] ;
     String sampleImagePath = args[1] ;
-    String trainedDataOutput = args[2] ;
-    String tmpImageDataOutput = args[3] ;
+    String trainedOutput = args[2] ;
+    String tmpImageOutput = args[3] ;
+    String detectImagePath = args[4] ;
+    String tmpDetectImageOutput = args[5] ;
 
     final FaceLearner faceLearner = new FaceLearner();
     
-    faceLearner.normalize(sampleImagePath,tmpImageDataOutput);
-    faceLearner.learn(tmpImageDataOutput);
-//    faceLearner.storeTrainedData(trainedDataOutput);
-    //faceRecognition.recognizeFileList("data/some-test-faces.txt");
-    //faceRecognition.recognizeFileList(args[1]);
+    faceLearner.normalize(sampleImagePath,tmpImageOutput);
+    faceLearner.learn(tmpImageOutput);
+    faceLearner.storeTrainedData(personName,trainedOutput);
+    faceLearner.normalize(detectImagePath, tmpDetectImageOutput);
+    faceLearner.recognize(tmpDetectImageOutput, trainedOutput, personName);
   }
+  /* From a normalized image file to recognized if match current trained data. 
+  */
+  public void recognize(String tmpDetectImageOutput, String trainedOutput, String personName){
 
+    File folder = new File(tmpDetectImageOutput);
+    File[] listOfFiles = folder.listFiles();
+    ArrayList<String> testFaceFileNames = new ArrayList<String>();
+
+    String answer ="";
+    // load image to testFaces array list
+    for (int i = 0; i < listOfFiles.length; i++) {
+       if (listOfFiles[i].isFile()) {
+           String file = listOfFiles[i].getName();
+           String filepath = tmpDetectImageOutput+"/"+file;
+           IplImage tmpImage= cvLoadImage( filepath, CV_LOAD_IMAGE_GRAYSCALE);
+           if(tmpImage != null){
+             testFaces.add(tmpImage) ;
+             testFaceFileNames.add(filepath) ;
+           }
+       }
+    }
+  
+    CvMat trainPersonNumMat = loadTrainingData(trainedOutput, personName);
+    
+//    int ntestfaces = testFaces.size() ;
+    int nTestFaces = testFaces.size() ;
+    LOGGER.info(trainedOutput+"/"+personName+".xml");
+    System.out.println("total: "+ nTestFaces+" to be tested latter..." );
+
+    personNumTruthMat = cvCreateMat( 1, nTestFaces, CV_32SC1); // type, 32-
+
+    float[] projectedTestFace = new float[nEigens] ;
+    float confidence = 0.0f;
+    int nCorrect = 0;
+    int nWrong = 0;
+    double timeFaceRecognizeStart = (double) cvGetTickCount(); // supposedly to record the timing??
+        for (int i = 0; i < nTestFaces; i++) {
+          int iNearest;
+          int nearest;
+          int truth;
+
+          // project the test image onto the PCA subspace
+          LOGGER.info("before find decomposite..");
+          cvEigenDecomposite(
+              testFaces.get(i),
+              nEigens, // nEigObjs
+              eigenVectArr, // eigInput (Pointer)
+              0, // ioFlags
+              null, // userData
+              pAvgTrainImg, // avg
+              projectedTestFace);  // coeffs
+
+      //LOGGER.info("projectedTestFace\n" + floatArrayToString(projectedTestFace));
+
+          final FloatPointer pConfidence = new FloatPointer(confidence);
+          LOGGER.info("before find nearest...");
+          iNearest = findNearestNeighbor(projectedTestFace, new FloatPointer(pConfidence));
+          confidence = pConfidence.get();
+          truth = personNumTruthMat.data_i().get(i);
+          nearest = trainPersonNumMat.data_i().get(iNearest);
+
+
+         if (nearest == truth) {
+            answer = "Correct";
+            nCorrect++;
+          } else {
+            answer = "WRONG!";
+            nWrong++;
+          }
+         LOGGER.info(testFaceFileNames.get(i));
+         LOGGER.info("nearest = " + nearest + ", Truth = " + truth + " (" + answer + "). Confidence = " + confidence);
+      }
+ 
+
+  }
+  /**
+  * store training data by person name.
+  */
+  public void storeTrainedData(String personName, String trainedOutput)
+    throws Exception{
+
+    CvFileStorage fileStorage;
+    String outputXmlFile = trainedOutput+"/"+personName+".xml" ;
+    LOGGER.info("writing " + outputXmlFile);
+    fileStorage = cvOpenFileStorage(outputXmlFile, null, CV_STORAGE_WRITE,null);
+                                 //(filename, memstorage, flags, encoding)...
+    cvWriteInt( fileStorage, personName, 1);
+             // fileStorage, person name, number of person 
+    // store all existing data
+ 
+    cvWriteInt( fileStorage,  "nPersons", 1); 
+
+    cvWriteInt(fileStorage, "nEigens", nEigens);
+    LOGGER.info("writing nTrainFaces...");
+
+    cvWriteInt(fileStorage,"nTrainFaces", nTrainFaces);
+
+    LOGGER.info("writing personNumTruthMat...");
+    cvWrite( fileStorage, "trainPersonNumMat", personNumTruthMat); 
+
+    cvWrite( fileStorage, "eigenValMat", eigenValMat); 
+
+    cvWrite( fileStorage, "projectedTrainFaceMat", projectedTrainFaceMat);
+
+    cvWrite(fileStorage, "avgTrainImg", pAvgTrainImg); 
+
+
+    for (int i = 0; i < nEigens; i++) {
+      String varname = "eigenVect_" + i;
+      cvWrite(
+              fileStorage, // fs
+              varname, // name
+              eigenVectArr[i]); // value
+    }
+
+    // release the file-storage interface
+    cvReleaseFileStorage(fileStorage);
+  }
   /**
   * 
   */
@@ -96,6 +216,13 @@ public class FaceLearner {
     faceImgSize.width(trainingFaces.get(0).width());
     faceImgSize.height(trainingFaces.get(0).height());
 
+    personNumTruthMat = cvCreateMat(1, nfaces, CV_32SC1);
+               // rows ,nFaces,  type, 32-bit unsigned, one channel
+
+      // initialize the person number matrix - for ease of debugging
+      for (int j1 = 0; j1 < nfaces; j1++) {
+        personNumTruthMat.put(0, j1, 0);
+      }
 
     for (int i = 0; i < nEigens; i++) {
       eigens.add( cvCreateImage(
@@ -200,10 +327,10 @@ public class FaceLearner {
   }
 
   /** normalized to 120*120 PGM files..*/
-  public void normalize(String sampleImagePath, String trainedDataOutput)throws Exception{
+  public void normalize(String sampleImagePath, String trainedOutput)throws Exception{
     Loader.load(opencv_objdetect.class);
     String srcPath = sampleImagePath;
-    String destPath = trainedDataOutput;
+    String destPath = trainedOutput;
 
     File folder = new File(srcPath);
     File[] listOfFiles = folder.listFiles();
@@ -263,4 +390,165 @@ public class FaceLearner {
 
   }
 
+
+
+
+  /** Find the most likely person based on a detection. Returns the index, and stores the confidence value into pConfidence.
+   *
+   * @param projectedTestFace the projected test face
+   * @param pConfidencePointer a pointer containing the confidence value
+   * @param iTestFace the test face index
+   * @return the index
+   */
+  private int findNearestNeighbor(float projectedTestFace[], FloatPointer pConfidencePointer) {
+    double leastDistSq = Double.MAX_VALUE;
+    int i = 0;
+    int iTrain = 0;
+    int iNearest = 0;
+
+    LOGGER.info("................");
+    LOGGER.info("find nearest neighbor from " + nTrainFaces + " training faces");
+    for (iTrain = 0; iTrain < nTrainFaces; iTrain++) {
+      //LOGGER.info("considering training face " + (iTrain + 1));
+      double distSq = 0;
+
+   for (i = 0; i < nEigens; i++) {
+        //LOGGER.debug("  projected test face distance from eigenface " + (i + 1) + " is " + projectedTestFace[i]);
+
+        float projectedTrainFaceDistance = (float) projectedTrainFaceMat.get(iTrain, i);
+        float d_i = projectedTestFace[i] - projectedTrainFaceDistance;
+        distSq += d_i * d_i; // / eigenValMat.data_fl().get(i);  // Mahalanobis distance (might give better results than Eucalidean distance)
+//          if (iTrain < 5) {
+//            LOGGER.info("    ** projected training face " + (iTrain + 1) + " distance from eigenface " + (i + 1) + " is " + projectedTrainFaceDistance);
+//            LOGGER.info("    distance between them " + d_i);
+//            LOGGER.info("    distance squared " + distSq);
+//          }
+      }
+
+      if (distSq < leastDistSq) {
+        leastDistSq = distSq;
+        iNearest = iTrain;
+        LOGGER.info("  training face " + (iTrain + 1) + " is the new best match, least squared distance: " + leastDistSq);
+      }
+    }
+
+   // Return the confidence level based on the Euclidean distance,
+    // so that similar images should give a confidence between 0.5 to 1.0,
+    // and very different images should give a confidence between 0.0 to 0.5.
+    float pConfidence = (float) (1.0f - Math.sqrt(leastDistSq / (float) (nTrainFaces * nEigens)) / 255.0f);
+    pConfidencePointer.put(pConfidence);
+
+    LOGGER.info("training face " + (iNearest + 1) + " is the final best match, confidence " + pConfidence);
+    return iNearest;
+  }
+
+
+  /** Opens the training data from the file 'data/facedata.xml'.
+   *
+   * @param pTrainPersonNumMat
+   * @return the person numbers during training, or null if not successful
+   */
+  private CvMat loadTrainingData(String dataPath, String personName) {
+    LOGGER.info("loading training data");
+    CvMat pTrainPersonNumMat = null; // the person numbers during training
+    CvFileStorage fileStorage;
+    int i;
+
+    String dataFilePath = dataPath+"/"+personName+".xml";
+    LOGGER.info("loading training data from "+dataFilePath);
+    // create a file-storage interface
+    fileStorage = cvOpenFileStorage(
+            dataFilePath, // filename
+            null, // memstorage
+            CV_STORAGE_READ, // flags
+            null); // encoding
+    if (fileStorage == null) {
+      LOGGER.severe("Can't open training database file '"+dataFilePath+"'.");
+      return null;
+    }
+
+    // Load the person names.
+    personNames.clear();        // Make sure it starts as empty.
+    nPersons = cvReadIntByName( fileStorage, null, personName, 0);
+    if (nPersons == 0) {
+      LOGGER.severe("No people found in the training database 'data/facedata.xml'.");
+      return null;
+    } else {
+      LOGGER.info(nPersons + " persons read from the training database");
+    }
+
+    // Load each person's name.
+    for (i = 0; i < nPersons; i++) {
+      String sPersonName;
+      String varname = "personName_" + (i + 1);
+      sPersonName = cvReadStringByName(
+              fileStorage, // fs
+              null, // map
+              varname,
+              "");
+      personNames.add(sPersonName);
+    }
+    LOGGER.info("person names: " + personNames);
+
+   // Load the data
+    nEigens = cvReadIntByName(
+            fileStorage, // fs
+            null, // map
+            "nEigens",
+            0); // default_value
+    nTrainFaces = cvReadIntByName(
+            fileStorage,
+            null, // map
+            "nTrainFaces",
+            0); // default_value
+    Pointer pointer = cvReadByName(
+            fileStorage, // fs
+            null, // map
+            "trainPersonNumMat"); // name
+    pTrainPersonNumMat = new CvMat(pointer);
+
+    pointer = cvReadByName(
+            fileStorage, // fs
+            null, // map
+            "eigenValMat"); // name
+    eigenValMat = new CvMat(pointer);
+
+    pointer = cvReadByName(
+            fileStorage, // fs
+            null, // map
+            "projectedTrainFaceMat"); // name
+    projectedTrainFaceMat = new CvMat(pointer);
+   pointer = cvReadByName(
+            fileStorage,
+            null, // map
+            "avgTrainImg");
+    pAvgTrainImg = new IplImage(pointer);
+
+    eigenVectArr = new IplImage[nTrainFaces];
+    for (i = 0; i <= nEigens; i++) {
+      String varname = "eigenVect_" + i;
+      pointer = cvReadByName(
+              fileStorage,
+              null, // map
+              varname);
+      eigenVectArr[i] = new IplImage(pointer);
+    }
+
+    // release the file-storage interface
+    cvReleaseFileStorage(fileStorage);
+
+    LOGGER.info("Training data loaded (" + nTrainFaces + " training images of " + nPersons + " people)");
+    final StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("People: ");
+    if (nPersons > 0) {
+      stringBuilder.append("<").append(personNames.get(0)).append(">");
+    }
+    for (i = 1; i < nPersons; i++) {
+      stringBuilder.append(", <").append(personNames.get(i)).append(">");
+    }
+    LOGGER.info(stringBuilder.toString());
+
+    return pTrainPersonNumMat;
+  }
 }
+

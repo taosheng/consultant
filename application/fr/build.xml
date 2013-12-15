@@ -42,11 +42,16 @@
   </target>
   <target name="run" depends="dist"
         description="defaul running program " >
+     <mkdir dir="/home/doug/toshow_tmp" />
+     <mkdir dir="/home/doug/mypic_tmp" />
+
      <java classname="FaceLearner"  >
          <arg value="taosheng"/>
          <arg value="/home/doug/mypic"/>
          <arg value="/home/doug/mypic_trained"/>
          <arg value="/home/doug/mypic_tmp"/>
+         <arg value="/home/doug/toshow"/>
+         <arg value="/home/doug/toshow_tmp"/>
          <classpath refid="run.classpath"> </classpath>
        </java>
   </target>
