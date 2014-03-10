@@ -1,5 +1,5 @@
 (1) install single node hadoop
-  * get source: adoop-2.2.0.tar.gz, extract it, 
+  * get source: hadoop-2.2.0.tar.gz, extract it, 
   * check JAVA_HOME
     if no, setup java home 
     doug@ts:~/hadoop/etc/hadoop$ export JAVA_HOME=/usr/lib/jvm/default-java
@@ -17,10 +17,16 @@
  export HADOO_MAPRED_HOME=/home/doug/hadoop
  export HADOOP_YARN_HOME=/home/doug/hadoop
  export HADOOP_CONF_DIR=/home/doug/hadoop/etc/hadoop
- expor tYARN_CONF_DIR=$HADOOP_CONF_DIR
+ export YARN_CONF_DIR=$HADOOP_CONF_DIR
  export PATH=$PATH:/home/doug/hadoop/bin
 
+ * start hadoop
+   /home/doug/hadoop/sbin/start-yarn.sh
+   /home/doug/hadoop/sbin/start-dfs.sh
+
+
  * run the example ./hadoop/bin/hadoop jar hadoop-examples.jar randomwriter out
+
   the hadoop-examples.jar download from ->wget http://www.java2s.com/Code/JarDownload/hadoop-examples/hadoop-examples.jar.zip
 
 (2) prepare environment
