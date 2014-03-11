@@ -11,14 +11,16 @@
 
   ==== environment settings ===
 
- export JAVA_HOME=/usr/lib/jvm/default-java
- export HADOOP_COMMON_HOME=/home/doug/hadoop
- export HADOOP_HDFS_HOME=/home/doug/hadoop
- export HADOO_MAPRED_HOME=/home/doug/hadoop
- export HADOOP_YARN_HOME=/home/doug/hadoop
- export HADOOP_CONF_DIR=/home/doug/hadoop/etc/hadoop
- export YARN_CONF_DIR=$HADOOP_CONF_DIR
- export PATH=$PATH:/home/doug/hadoop/bin
+    ## Hadoop variables in ~/.bashrc
+    export HADOOP_INSTALL=/home/doug/hadoop
+    export PATH=$PATH:$HADOOP_INSTALL/bin
+    export PATH=$PATH:$HADOOP_INSTALL/sbin
+    export HADOOP_CONF_DIR=/home/doug/hadoop/etc/hadoop
+    export HADOOP_MAPRED_HOME=$HADOOP_INSTALL
+    export HADOOP_COMMON_HOME=$HADOOP_INSTALL
+    export HADOOP_HDFS_HOME=$HADOOP_INSTALL
+    export YARN_HOME=$HADOOP_INSTALL
+
 
  * start hadoop
    /home/doug/hadoop/sbin/start-yarn.sh
@@ -27,7 +29,7 @@
 
  * run the example ./hadoop/bin/hadoop jar hadoop-examples.jar randomwriter out
 
-  the hadoop-examples.jar download from ->wget http://www.java2s.com/Code/JarDownload/hadoop-examples/hadoop-examples.jar.zip
+  the hadoop-examples.jar download from -> wget http://www.java2s.com/Code/JarDownload/hadoop-examples/hadoop-examples.jar.zip
 
 (2) prepare environment
 
